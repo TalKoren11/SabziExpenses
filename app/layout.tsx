@@ -1,21 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Rubik } from "next/font/google";
 import "./globals.css";
 import { BottomNav } from "@/components/BottomNav";
 import { ServiceWorker } from "@/components/ServiceWorker";
+import { LanguageProvider } from "@/lib/i18n/context";
+import type { Locale } from "@/lib/i18n/types";
+import { getProfile } from "@/lib/queries";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const rubik = Rubik({ variable: "--font-rubik", subsets: ["latin", "hebrew"] });
 
 export const metadata: Metadata = {
   title: "Sabzi Expenses",
   description: "Track spending in two taps.",
   manifest: "/manifest.webmanifest",
   icons: { apple: "/apple-icon.png" },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "Sabzi",
-  },
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Sabzi" },
 };
 
 export const viewport: Viewport = {
@@ -27,12 +26,18 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const profile = await getProfile();
+  const locale = (profile?.language ?? "he") as Locale;
+  const dir = locale === "he" ? "rtl" : "ltr";
+
   return (
-    <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
+    <html lang={locale} dir={dir} className={`${rubik.variable} h-full antialiased`}>
       <body className="mx-auto flex min-h-full max-w-md flex-col">
-        {children}
-        <BottomNav />
+        <LanguageProvider initialLocale={locale}>
+          {children}
+          <BottomNav />
+        </LanguageProvider>
         <ServiceWorker />
       </body>
     </html>
