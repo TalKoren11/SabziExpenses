@@ -33,6 +33,7 @@ export interface Profile {
   id: string;
   currency: string;
   siri_token: string;
+  language: string;
   created_at: string;
 }
 
