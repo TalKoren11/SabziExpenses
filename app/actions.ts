@@ -120,6 +120,14 @@ export async function updateCurrency(currency: string) {
   return { ok: true };
 }
 
+export async function updateLanguage(language: string) {
+  const { supabase, user } = await requireUser();
+  const { error } = await supabase.from("profiles").update({ language }).eq("id", user.id);
+  if (error) return { error: error.message };
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
 export async function signOut() {
   const { supabase } = await requireUser();
   await supabase.auth.signOut();

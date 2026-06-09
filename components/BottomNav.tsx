@@ -2,17 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-const TABS = [
-  { href: "/", label: "Add", icon: "➕" },
-  { href: "/overview", label: "Overview", icon: "📊" },
-  { href: "/import", label: "Import", icon: "📸" },
-  { href: "/settings", label: "Settings", icon: "⚙️" },
-];
+import { useTranslation } from "@/lib/i18n/context";
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { t } = useTranslation();
+
   if (pathname === "/login" || pathname.startsWith("/auth")) return null;
+
+  const TABS = [
+    { href: "/", label: t("nav.home"), icon: "➕" },
+    { href: "/overview", label: t("nav.overview"), icon: "📊" },
+    { href: "/import", label: t("nav.import"), icon: "📸" },
+    { href: "/settings", label: t("nav.settings"), icon: "⚙️" },
+  ];
 
   return (
     <nav
