@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🥬 Sabzi Expenses
 
-## Getting Started
+A fast, mobile-first expense tracker PWA. Add expenses in two taps, see your running
+balance (income − expenses), and auto-import from Apple Pay screenshots with Claude vision.
 
-First, run the development server:
+- **One-screen quick add** — amount → category → save.
+- **Hands-free Siri Shortcut** — "Hey Siri, add expense" posts to a token-authed endpoint.
+- **Home-screen install** — Add to Home Screen runs full-screen like a native app.
+- **Apple Pay screenshot import** — Claude reads the screenshot and bulk-adds transactions.
+
+Stack: **Next.js 16 (App Router)** · **Supabase** (Postgres + Auth + RLS) · **Anthropic** (vision) · **Vercel**.
+
+---
+
+## 1. Supabase setup
+
+1. Create a free project at [supabase.com](https://supabase.com/dashboard).
+2. In the dashboard → **SQL Editor**, paste and run the contents of
+   [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql).
+   This creates the tables, RLS policies, and a signup trigger that seeds default
+   categories + a Siri token for each new user.
+3. In **Authentication → Providers → Email**, ensure email sign-in (magic link) is enabled.
+4. From **Project Settings → API**, copy your `Project URL`, `anon` key, and `service_role` key.
+
+## 2. Environment variables
+
+Copy `.env.example` to `.env.local` and fill in:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...   # server-only, used by the Siri webhook
+ANTHROPIC_API_KEY=sk-ant-...    # server-only, used for screenshot parsing
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Get an Anthropic key at [console.anthropic.com](https://console.anthropic.com).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 3. Run locally
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev      # http://localhost:3000
+npm test         # unit + API tests
+```
 
-## Learn More
+## 4. Deploy to Vercel
 
-To learn more about Next.js, take a look at the following resources:
+1. Push this repo to GitHub, then import it at [vercel.com/new](https://vercel.com/new).
+2. Add the four env vars above in the Vercel project settings.
+3. Deploy. Note your HTTPS URL (e.g. `https://sabzi.vercel.app`).
+4. In Supabase → **Authentication → URL Configuration**, add your Vercel URL to
+   **Site URL** and **Redirect URLs** (`https://your-app.vercel.app/auth/callback`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 5. Install on your iPhone
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open the Vercel URL in **Safari** → Share → **Add to Home Screen**. It launches
+full-screen straight into the Quick Add screen.
 
-## Deploy on Vercel
+## 6. Set up the Siri Shortcut
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+In the app: **Settings → Hey Siri, add expense** shows your endpoint and token. Then in the
+iOS **Shortcuts** app:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. New Shortcut → **Ask for Input** (Number, prompt "How much?").
+2. **Get Contents of URL** → your `/api/quick-add` endpoint, Method **POST**,
+   Header `x-siri-token: <your token>`, Request Body **JSON**:
+   `{ "amount": <Provided Input>, "note": "" }`.
+3. Name it "Add expense" and trigger with "Hey Siri, add expense".
+
+> Keep your Siri token secret — anyone with it can add expenses to your account.
+
+---
+
+## Project layout
+
+| Path | Purpose |
+|------|---------|
+| `app/page.tsx` + `components/QuickAdd.tsx` | Quick Add home screen |
+| `app/overview` + `components/Overview.tsx` | Balance, breakdown, recent list |
+| `app/import` + `components/ImportScreenshot.tsx` | Apple Pay screenshot import |
+| `app/settings` + `components/Settings.tsx` | Currency, categories, Siri setup |
+| `app/api/quick-add/route.ts` | Token-authed Siri webhook |
+| `app/api/parse-screenshot/route.ts` | Claude vision parsing |
+| `lib/balance.ts` | Balance / period / breakdown / formatting (unit-tested) |
+| `lib/parse-screenshot.ts` | Claude call + output normalization (unit-tested) |
+| `lib/queries.ts` / `app/actions.ts` | Server reads / server-action writes |
+| `supabase/migrations/0001_init.sql` | Schema, RLS, signup seed |
