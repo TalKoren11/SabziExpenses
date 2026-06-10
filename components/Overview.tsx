@@ -4,28 +4,63 @@ import { useMemo, useState, useTransition } from "react";
 import { deleteTransaction } from "@/app/actions";
 import { breakdownByCategory, computeBalance, filterByPeriod, formatCurrency, type Period } from "@/lib/balance";
 import { useTranslation } from "@/lib/i18n/context";
-import type { TransactionWithCategory } from "@/lib/types";
+import type { Account, TransactionWithCategory } from "@/lib/types";
 
 export function Overview({
   transactions,
   currency,
-  showAccounts,
+  accounts,
 }: {
   transactions: TransactionWithCategory[];
   currency: string;
-  showAccounts: boolean;
+  accounts: Account[];
 }) {
   const { t } = useTranslation();
   const [period, setPeriod] = useState<Period>("month");
+  const [accountId, setAccountId] = useState<string | "all">("all");
   const [isPending, startTransition] = useTransition();
+  const showAccounts = accounts.length > 1 && accountId === "all";
 
-  const inPeriod = useMemo(() => filterByPeriod(transactions, period), [transactions, period]);
+  const byAccount = useMemo(
+    () => (accountId === "all" ? transactions : transactions.filter((t) => t.account_id === accountId)),
+    [transactions, accountId]
+  );
+  const inPeriod = useMemo(() => filterByPeriod(byAccount, period), [byAccount, period]);
   const { income, expense, balance } = useMemo(() => computeBalance(inPeriod), [inPeriod]);
   const breakdown = useMemo(() => breakdownByCategory(inPeriod), [inPeriod]);
   const maxCat = breakdown[0]?.total ?? 0;
 
   return (
     <main className="flex flex-1 flex-col gap-4 px-4 pt-5">
+      {accounts.length > 1 && (
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="radiogroup" aria-label={t("home.account")}>
+          <button
+            role="radio"
+            aria-checked={accountId === "all"}
+            onClick={() => setAccountId("all")}
+            className={`flex shrink-0 items-center rounded-full px-3 py-1.5 text-sm font-medium transition active:scale-95 ${
+              accountId === "all" ? "bg-accent text-white" : "bg-card text-muted ring-1 ring-border"
+            }`}
+          >
+            {t("overview.allAccounts")}
+          </button>
+          {accounts.map((a) => (
+            <button
+              key={a.id}
+              role="radio"
+              aria-checked={accountId === a.id}
+              onClick={() => setAccountId(a.id)}
+              className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition active:scale-95 ${
+                accountId === a.id ? "bg-accent text-white" : "bg-card text-muted ring-1 ring-border"
+              }`}
+            >
+              <span className="text-base leading-none">{a.emoji}</span>
+              <span>{a.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="rounded-3xl bg-card p-5 ring-1 ring-border">
         <div className="mb-3 flex items-center justify-between">
           <span className="text-sm font-medium text-muted">{t("overview.balance")}</span>

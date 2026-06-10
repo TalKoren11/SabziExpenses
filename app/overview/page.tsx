@@ -7,7 +7,7 @@ export default async function OverviewPage() {
     <Overview
       transactions={transactions}
       currency={profile?.currency ?? "ILS"}
-      showAccounts={accounts.filter((a) => !a.archived).length > 1}
+      accounts={accounts.filter((a) => !a.archived)}
     />
   );
 }

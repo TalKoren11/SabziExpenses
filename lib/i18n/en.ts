@@ -34,6 +34,7 @@ const en: Translations = {
     recent: "Recent",
     noTransactions: "No transactions yet. Add one from the ➕ tab.",
     uncategorised: "Uncategorised",
+    allAccounts: "All accounts",
   },
   settings: {
     title: "Settings",

@@ -14,7 +14,7 @@ export type Translations = {
   };
   overview: {
     balance: string; thisMonth: string; allTime: string; whereItWent: string;
-    recent: string; noTransactions: string; uncategorised: string;
+    recent: string; noTransactions: string; uncategorised: string; allAccounts: string;
   };
   settings: {
     title: string; currency: string; language: string; hebrew: string; english: string;

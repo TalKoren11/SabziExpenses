@@ -34,6 +34,7 @@ const he: Translations = {
     recent: "אחרון",
     noTransactions: "אין עדיין עסקאות. הוסף אחת מהכרטיסייה ➕.",
     uncategorised: "לא מסווג",
+    allAccounts: "כל החשבונות",
   },
   settings: {
     title: "הגדרות",
