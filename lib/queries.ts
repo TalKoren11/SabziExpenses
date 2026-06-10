@@ -1,4 +1,5 @@
 import "server-only";
+import { toDateInputValue } from "./date";
 import { createClient } from "./supabase/server";
 import type { Category, Profile, TransactionWithCategory } from "./types";
 
@@ -22,6 +23,18 @@ export async function getCategories(): Promise<Category[]> {
     .order("type", { ascending: true })
     .order("sort_order", { ascending: true });
   return (data ?? []) as Category[];
+}
+
+/** Date (YYYY-MM-DD) of the most recent transaction, or null if there are none. */
+export async function getLastTransactionDate(): Promise<string | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("transactions")
+    .select("occurred_at")
+    .order("occurred_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data ? toDateInputValue(data.occurred_at) : null;
 }
 
 /** Recent transactions joined with their category. */

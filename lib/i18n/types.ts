@@ -10,6 +10,7 @@ export type Translations = {
   home: {
     expense: string; income: string; notePlaceholder: string;
     saving: string; save: string; enterAmount: string; saved: string;
+    date: string; selectDate: string;
   };
   overview: {
     balance: string; thisMonth: string; allTime: string; whereItWent: string;
