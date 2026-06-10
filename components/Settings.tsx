@@ -1,15 +1,36 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { addCategory, archiveCategory, signOut, updateCategory, updateCurrency, updateLanguage } from "@/app/actions";
+import {
+  addAccount,
+  addCategory,
+  archiveAccount,
+  archiveCategory,
+  setDefaultAccount,
+  signOut,
+  updateAccount,
+  updateCategory,
+  updateCurrency,
+  updateLanguage,
+} from "@/app/actions";
 import { useAutoSave, useOrigin } from "@/lib/client-hooks";
 import { useTranslation } from "@/lib/i18n/context";
 import type { Locale } from "@/lib/i18n/types";
-import type { Category, TxType } from "@/lib/types";
+import type { Account, Category, TxType } from "@/lib/types";
 
 const CURRENCIES = ["ILS", "USD", "EUR", "GBP", "INR"];
 
-export function Settings({ categories, currency, siriToken }: { categories: Category[]; currency: string; siriToken: string }) {
+export function Settings({
+  categories,
+  accounts,
+  currency,
+  siriToken,
+}: {
+  categories: Category[];
+  accounts: Account[];
+  currency: string;
+  siriToken: string;
+}) {
   const { t, locale, setLocale } = useTranslation();
   const [, startTransition] = useTransition();
   const [autoSave, setAutoSave] = useAutoSave();
@@ -67,6 +88,10 @@ export function Settings({ categories, currency, siriToken }: { categories: Cate
         </label>
       </Section>
 
+      <Section title={t("settings.accounts")}>
+        <AccountManager accounts={accounts} />
+      </Section>
+
       <Section title={t("settings.categories")}>
         <CategoryManager categories={categories} />
       </Section>
@@ -99,6 +124,83 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <h2 className="mb-3 text-sm font-semibold text-muted">{title}</h2>
       {children}
     </section>
+  );
+}
+
+function AccountManager({ accounts }: { accounts: Account[] }) {
+  const { t } = useTranslation();
+  const [isPending, startTransition] = useTransition();
+  const [newName, setNewName] = useState("");
+  const [newEmoji, setNewEmoji] = useState("💳");
+  const active = accounts.filter((a) => !a.archived);
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2">
+        {active.map((a) => <AccountRow key={a.id} account={a} canArchive={active.length > 1} />)}
+      </div>
+      <div className="flex items-center gap-2 border-t border-border pt-3">
+        <input value={newEmoji} onChange={(e) => setNewEmoji(e.target.value)} className="w-12 rounded-lg border border-border bg-background py-1.5 text-center" maxLength={2} />
+        <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t("settings.newAccount")} className="min-w-0 flex-1 rounded-lg border border-border bg-background px-2 py-1.5 text-sm" />
+        <button
+          disabled={isPending || !newName.trim()}
+          onClick={() => startTransition(async () => { await addAccount({ name: newName, emoji: newEmoji }); setNewName(""); setNewEmoji("💳"); })}
+          className="rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50"
+        >
+          {t("settings.add")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function AccountRow({ account, canArchive }: { account: Account; canArchive: boolean }) {
+  const { t } = useTranslation();
+  const [isPending, startTransition] = useTransition();
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(account.name);
+  const [emoji, setEmoji] = useState(account.emoji);
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-2">
+        <input value={emoji} onChange={(e) => setEmoji(e.target.value)} className="w-12 rounded-lg border border-border bg-background py-1.5 text-center" maxLength={2} />
+        <input value={name} onChange={(e) => setName(e.target.value)} className="min-w-0 flex-1 rounded-lg border border-border bg-background px-2 py-1.5 text-sm" />
+        <button
+          disabled={isPending}
+          onClick={() => startTransition(async () => { await updateAccount(account.id, { name, emoji }); setEditing(false); })}
+          className="text-sm font-semibold text-accent"
+        >
+          {t("settings.save")}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <span className="text-xl">{account.emoji}</span>
+      <span className="flex-1">{account.name}</span>
+      <button
+        disabled={isPending || account.is_default}
+        onClick={() => startTransition(() => setDefaultAccount(account.id).then(() => {}))}
+        title={t("settings.setDefault")}
+        aria-label={t("settings.setDefault")}
+        className={`px-1 ${account.is_default ? "text-accent" : "text-muted"}`}
+      >
+        {account.is_default ? "★" : "☆"}
+      </button>
+      <button onClick={() => setEditing(true)} className="px-1 text-muted">✎</button>
+      <button
+        disabled={isPending || !canArchive || account.is_default}
+        onClick={() => startTransition(() => archiveAccount(account.id, true).then(() => {}))}
+        className="px-1 text-muted disabled:opacity-30"
+        aria-label="Archive"
+        title={account.is_default ? t("settings.default") : undefined}
+      >
+        🗑
+      </button>
+    </div>
   );
 }
 

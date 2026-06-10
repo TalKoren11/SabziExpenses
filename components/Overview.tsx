@@ -6,7 +6,15 @@ import { breakdownByCategory, computeBalance, filterByPeriod, formatCurrency, ty
 import { useTranslation } from "@/lib/i18n/context";
 import type { TransactionWithCategory } from "@/lib/types";
 
-export function Overview({ transactions, currency }: { transactions: TransactionWithCategory[]; currency: string }) {
+export function Overview({
+  transactions,
+  currency,
+  showAccounts,
+}: {
+  transactions: TransactionWithCategory[];
+  currency: string;
+  showAccounts: boolean;
+}) {
   const { t } = useTranslation();
   const [period, setPeriod] = useState<Period>("month");
   const [isPending, startTransition] = useTransition();
@@ -75,7 +83,10 @@ export function Overview({ transactions, currency }: { transactions: Transaction
             <span className="text-2xl">{tx.category?.emoji ?? "❓"}</span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{tx.category?.name ?? t("overview.uncategorised")}</p>
-              <p className="truncate text-xs text-muted">{tx.note || new Date(tx.occurred_at).toLocaleDateString()}</p>
+              <p className="truncate text-xs text-muted">
+                {tx.note || new Date(tx.occurred_at).toLocaleDateString()}
+                {showAccounts && tx.account && ` · ${tx.account.emoji} ${tx.account.name}`}
+              </p>
             </div>
             <span className={`tabular-nums text-sm font-semibold ${tx.type === "income" ? "text-emerald-600" : "text-foreground"}`}>
               {tx.type === "income" ? "+" : "−"}{formatCurrency(tx.amount, currency).replace("-", "")}

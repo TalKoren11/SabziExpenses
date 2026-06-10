@@ -14,11 +14,13 @@ function tx(
     id: Math.random().toString(36).slice(2),
     user_id: "u1",
     category_id: partial.category?.id ?? null,
+    account_id: partial.account?.id ?? null,
     note: null,
     occurred_at: partial.occurred_at ?? "2026-06-08T10:00:00.000Z",
     source: "manual",
     created_at: partial.occurred_at ?? "2026-06-08T10:00:00.000Z",
     category: partial.category ?? null,
+    account: partial.account ?? null,
     ...partial,
   };
 }

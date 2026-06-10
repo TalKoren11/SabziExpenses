@@ -24,6 +24,7 @@ const he: Translations = {
     saved: "נשמר",
     date: "תאריך",
     selectDate: "בחר תאריך",
+    account: "חשבון",
   },
   overview: {
     balance: "יתרה",
@@ -54,6 +55,10 @@ const he: Translations = {
     add: "הוסף",
     save: "שמור",
     signOut: "התנתק",
+    accounts: "חשבונות",
+    newAccount: "חשבון חדש",
+    setDefault: "הגדר כברירת מחדל",
+    default: "ברירת מחדל",
   },
   import: {
     title: "ייבוא מ-Apple Pay",

@@ -9,7 +9,15 @@ import type { Category, ParsedExpense } from "@/lib/types";
 
 type Row = ParsedExpense & { categoryId: string | null; include: boolean };
 
-export function ImportScreenshot({ categories, currency }: { categories: Category[]; currency: string }) {
+export function ImportScreenshot({
+  categories,
+  currency,
+  defaultAccountId,
+}: {
+  categories: Category[];
+  currency: string;
+  defaultAccountId: string | null;
+}) {
   const router = useRouter();
   const { t } = useTranslation();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -46,7 +54,10 @@ export function ImportScreenshot({ categories, currency }: { categories: Categor
     if (selected.length === 0) return;
     setStatus("saving");
     startTransition(async () => {
-      const res = await bulkAddTransactions(selected.map((r) => ({ amount: r.amount, categoryId: r.categoryId, note: r.merchant, occurredAt: r.date ? new Date(r.date).toISOString() : null })));
+      const res = await bulkAddTransactions(
+        selected.map((r) => ({ amount: r.amount, categoryId: r.categoryId, note: r.merchant, occurredAt: r.date ? new Date(r.date).toISOString() : null })),
+        defaultAccountId
+      );
       if (res?.error) { setError(res.error); setStatus("review"); }
       else router.push("/overview");
     });

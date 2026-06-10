@@ -12,21 +12,34 @@ export interface Category {
   created_at: string;
 }
 
+export interface Account {
+  id: string;
+  user_id: string;
+  name: string;
+  emoji: string;
+  is_default: boolean;
+  sort_order: number;
+  archived: boolean;
+  created_at: string;
+}
+
 export interface Transaction {
   id: string;
   user_id: string;
   amount: number;
   type: TxType;
   category_id: string | null;
+  account_id: string | null;
   note: string | null;
   occurred_at: string;
   source: TxSource;
   created_at: string;
 }
 
-/** A transaction joined with its category, as returned to the UI. */
+/** A transaction joined with its category and account, as returned to the UI. */
 export interface TransactionWithCategory extends Transaction {
   category: Pick<Category, "id" | "name" | "emoji"> | null;
+  account: Pick<Account, "id" | "name" | "emoji"> | null;
 }
 
 export interface Profile {

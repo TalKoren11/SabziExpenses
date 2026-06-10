@@ -18,6 +18,7 @@ export interface AddTransactionInput {
   amount: number;
   type: TxType;
   categoryId: string | null;
+  accountId: string | null;
   note?: string | null;
   occurredAt?: string;
 }
@@ -32,6 +33,7 @@ export async function addTransaction(input: AddTransactionInput) {
     amount: input.amount,
     type: input.type,
     category_id: input.categoryId,
+    account_id: input.accountId,
     note: input.note?.trim() || null,
     occurred_at: input.occurredAt ?? new Date().toISOString(),
     source: "manual",
@@ -43,7 +45,8 @@ export async function addTransaction(input: AddTransactionInput) {
 }
 
 export async function bulkAddTransactions(
-  rows: { amount: number; categoryId: string | null; note: string | null; occurredAt: string | null }[]
+  rows: { amount: number; categoryId: string | null; note: string | null; occurredAt: string | null }[],
+  accountId: string | null
 ) {
   const { supabase, user } = await requireUser();
   const valid = rows.filter((r) => Number.isFinite(r.amount) && r.amount > 0);
@@ -54,6 +57,7 @@ export async function bulkAddTransactions(
       amount: r.amount,
       type: "expense" as const,
       category_id: r.categoryId,
+      account_id: accountId,
       note: r.note?.trim() || null,
       occurred_at: r.occurredAt ?? new Date().toISOString(),
       source: "screenshot" as const,
@@ -106,6 +110,53 @@ export async function updateCategory(id: string, input: { name: string; emoji: s
 export async function archiveCategory(id: string, archived: boolean) {
   const { supabase } = await requireUser();
   const { error } = await supabase.from("categories").update({ archived }).eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/settings");
+  revalidatePath("/");
+  return { ok: true };
+}
+
+export async function addAccount(input: { name: string; emoji: string }) {
+  const { supabase, user } = await requireUser();
+  const name = input.name.trim();
+  if (!name) return { error: "Name is required." };
+  const { error } = await supabase.from("accounts").insert({
+    user_id: user.id,
+    name,
+    emoji: input.emoji.trim() || "💳",
+    sort_order: 100,
+  });
+  if (error) return { error: error.message };
+  revalidatePath("/settings");
+  revalidatePath("/");
+  return { ok: true };
+}
+
+export async function updateAccount(id: string, input: { name: string; emoji: string }) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase
+    .from("accounts")
+    .update({ name: input.name.trim(), emoji: input.emoji.trim() || "💳" })
+    .eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/settings");
+  revalidatePath("/");
+  return { ok: true };
+}
+
+export async function archiveAccount(id: string, archived: boolean) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase.from("accounts").update({ archived }).eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/settings");
+  revalidatePath("/");
+  return { ok: true };
+}
+
+export async function setDefaultAccount(id: string) {
+  const { supabase, user } = await requireUser();
+  await supabase.from("accounts").update({ is_default: false }).eq("user_id", user.id);
+  const { error } = await supabase.from("accounts").update({ is_default: true }).eq("id", id);
   if (error) return { error: error.message };
   revalidatePath("/settings");
   revalidatePath("/");

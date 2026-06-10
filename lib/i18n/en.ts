@@ -24,6 +24,7 @@ const en: Translations = {
     saved: "Saved",
     date: "Date",
     selectDate: "Select a date",
+    account: "Account",
   },
   overview: {
     balance: "Balance",
@@ -54,6 +55,10 @@ const en: Translations = {
     add: "Add",
     save: "Save",
     signOut: "Sign out",
+    accounts: "Accounts",
+    newAccount: "New account",
+    setDefault: "Set as default",
+    default: "Default",
   },
   import: {
     title: "Import from Apple Pay",

@@ -6,14 +6,16 @@ import { currencySymbol } from "@/lib/balance";
 import { useAutoSave } from "@/lib/client-hooks";
 import { formatDateDDMMYYYY, todayDateInputValue } from "@/lib/date";
 import { useTranslation } from "@/lib/i18n/context";
-import type { Category, TxType } from "@/lib/types";
+import type { Account, Category, TxType } from "@/lib/types";
 
 export function QuickAdd({
   categories,
+  accounts,
   currency,
   defaultDate,
 }: {
   categories: Category[];
+  accounts: Account[];
   currency: string;
   defaultDate: string | null;
 }) {
@@ -22,6 +24,9 @@ export function QuickAdd({
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(defaultDate ?? todayDateInputValue());
   const [categoryId, setCategoryId] = useState<string | null>(null);
+  const visibleAccounts = useMemo(() => accounts.filter((a) => !a.archived), [accounts]);
+  const defaultAccount = visibleAccounts.find((a) => a.is_default) ?? visibleAccounts[0] ?? null;
+  const [accountId, setAccountId] = useState<string | null>(defaultAccount?.id ?? null);
   const [note, setNote] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const [autoSave] = useAutoSave();
@@ -55,6 +60,7 @@ export function QuickAdd({
         amount: numericAmount,
         type,
         categoryId: catId,
+        accountId,
         note,
         occurredAt: new Date(date).toISOString(),
       });
@@ -95,6 +101,25 @@ export function QuickAdd({
           </button>
         ))}
       </div>
+
+      {visibleAccounts.length > 1 && (
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="radiogroup" aria-label={t("home.account")}>
+          {visibleAccounts.map((a) => (
+            <button
+              key={a.id}
+              role="radio"
+              aria-checked={accountId === a.id}
+              onClick={() => setAccountId(a.id)}
+              className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition active:scale-95 ${
+                accountId === a.id ? "bg-accent text-white" : "bg-card text-muted ring-1 ring-border"
+              }`}
+            >
+              <span className="text-base leading-none">{a.emoji}</span>
+              <span>{a.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="flex items-baseline justify-center gap-1 py-3">
         <span className="text-3xl font-medium text-muted">{currencySymbol(currency)}</span>
