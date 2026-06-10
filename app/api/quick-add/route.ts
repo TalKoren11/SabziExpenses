@@ -56,11 +56,20 @@ export async function POST(request: NextRequest) {
     categoryId = cat?.id ?? null;
   }
 
+  const { data: account } = await admin
+    .from("accounts")
+    .select("id")
+    .eq("user_id", profile.id)
+    .eq("is_default", true)
+    .limit(1)
+    .maybeSingle();
+
   const { error } = await admin.from("transactions").insert({
     user_id: profile.id,
     amount: Math.round(amount * 100) / 100,
     type,
     category_id: categoryId,
+    account_id: account?.id ?? null,
     note,
     source: "siri",
   });

@@ -10,17 +10,18 @@ export type Translations = {
   home: {
     expense: string; income: string; notePlaceholder: string;
     saving: string; save: string; enterAmount: string; saved: string;
-    date: string; selectDate: string;
+    date: string; selectDate: string; account: string;
   };
   overview: {
     balance: string; thisMonth: string; allTime: string; whereItWent: string;
-    recent: string; noTransactions: string; uncategorised: string;
+    recent: string; noTransactions: string; uncategorised: string; allAccounts: string;
   };
   settings: {
     title: string; currency: string; language: string; hebrew: string; english: string;
     fastAdd: string; fastAddDesc: string; categories: string;
     siri: string; siriDesc: string; copyEndpoint: string; copied: string; siriSecret: string;
     newCategory: string; expense: string; income: string; add: string; save: string; signOut: string;
+    accounts: string; newAccount: string; setDefault: string; default: string;
   };
   import: {
     title: string; subtitle: string; chooseScreenshot: string; chooseHint: string;

@@ -21,6 +21,15 @@ vi.mock("@/lib/supabase/admin", () => ({
           }),
         };
       }
+      if (table === "accounts") {
+        return {
+          select: () => ({
+            eq: () => ({
+              eq: () => ({ limit: () => ({ maybeSingle: async () => ({ data: null }) }) }),
+            }),
+          }),
+        };
+      }
       return { insert: insertMock };
     },
   }),

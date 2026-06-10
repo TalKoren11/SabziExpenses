@@ -24,6 +24,7 @@ const en: Translations = {
     saved: "Saved",
     date: "Date",
     selectDate: "Select a date",
+    account: "Account",
   },
   overview: {
     balance: "Balance",
@@ -33,6 +34,7 @@ const en: Translations = {
     recent: "Recent",
     noTransactions: "No transactions yet. Add one from the ➕ tab.",
     uncategorised: "Uncategorised",
+    allAccounts: "All accounts",
   },
   settings: {
     title: "Settings",
@@ -54,6 +56,10 @@ const en: Translations = {
     add: "Add",
     save: "Save",
     signOut: "Sign out",
+    accounts: "Accounts",
+    newAccount: "New account",
+    setDefault: "Set as default",
+    default: "Default",
   },
   import: {
     title: "Import from Apple Pay",
