@@ -102,22 +102,25 @@ export function QuickAdd({
         ))}
       </div>
 
-      {visibleAccounts.length > 1 && (
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="radiogroup" aria-label={t("home.account")}>
-          {visibleAccounts.map((a) => (
-            <button
-              key={a.id}
-              role="radio"
-              aria-checked={accountId === a.id}
-              onClick={() => setAccountId(a.id)}
-              className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition active:scale-95 ${
-                accountId === a.id ? "bg-accent text-white" : "bg-card text-muted ring-1 ring-border"
-              }`}
-            >
-              <span className="text-base leading-none">{a.emoji}</span>
-              <span>{a.name}</span>
-            </button>
-          ))}
+      {visibleAccounts.length > 0 && (
+        <div className="mt-1">
+          <p className="mb-1 px-1 text-xs font-medium text-muted">{t("home.account")}</p>
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="radiogroup" aria-label={t("home.account")}>
+            {visibleAccounts.map((a) => (
+              <button
+                key={a.id}
+                role="radio"
+                aria-checked={accountId === a.id}
+                onClick={() => setAccountId(a.id)}
+                className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition active:scale-95 ${
+                  accountId === a.id ? "bg-accent text-white" : "bg-card text-muted ring-1 ring-border"
+                }`}
+              >
+                <span className="text-base leading-none">{a.emoji}</span>
+                <span>{a.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
