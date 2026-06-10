@@ -22,6 +22,8 @@ const en: Translations = {
     save: "Save ✓",
     enterAmount: "Enter an amount first",
     saved: "Saved",
+    date: "Date",
+    selectDate: "Select a date",
   },
   overview: {
     balance: "Balance",

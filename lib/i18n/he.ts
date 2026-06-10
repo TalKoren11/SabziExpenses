@@ -22,6 +22,8 @@ const he: Translations = {
     save: "שמור ✓",
     enterAmount: "הזן סכום תחילה",
     saved: "נשמר",
+    date: "תאריך",
+    selectDate: "בחר תאריך",
   },
   overview: {
     balance: "יתרה",
