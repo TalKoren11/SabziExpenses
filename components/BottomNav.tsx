@@ -19,7 +19,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="sticky bottom-0 z-10 mt-auto grid grid-cols-4 border-t border-border bg-card/90 backdrop-blur"
+      className="z-10 grid grid-cols-4 border-t border-border bg-card/90 backdrop-blur"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       {TABS.map((tab) => {

@@ -32,10 +32,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const dir = locale === "he" ? "rtl" : "ltr";
 
   return (
-    <html lang={locale} dir={dir} className={`${rubik.variable} h-full antialiased`}>
-      <body className="mx-auto flex min-h-full max-w-md flex-col">
+    <html lang={locale} dir={dir} className={`${rubik.variable} h-dvh antialiased`}>
+      <body className="mx-auto flex h-full max-w-md flex-col overflow-hidden">
         <LanguageProvider initialLocale={locale}>
-          {children}
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+            {children}
+          </div>
           <BottomNav />
         </LanguageProvider>
         <ServiceWorker />
